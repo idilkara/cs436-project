@@ -22,6 +22,7 @@ frontend and backend source code respositories:
     for frontend and backend, build images and push them to your registry. 
 
     for frontend: 
+    
         cd frontend/308_frontend
 
         docker build -t vegan-eats-frontend .
@@ -36,7 +37,7 @@ frontend and backend source code respositories:
 
         docker tag vegan-eats-backend:latest <yourdockeraccountname>/vegan-eats-backend:latest
 
-    based on that, change the container image path. 
+    based on <yourdockeraccountname>, change the container image path in deployment.yaml
 
 apply deployments and services:
 
