@@ -1,0 +1,18 @@
+@import 'slick-carousel/slick/slick.css'; 
+@import 'slick-carousel/slick/slick-theme.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+nav a:hover {
+    color: #2b8740 !important; /* A custom hover color */
+  }
+  footer a {
+    color: #bbb;
+  }
+  footer a:hover {
+    color: #5357a7; /* A custom hover color */
+  }
+  
