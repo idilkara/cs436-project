@@ -22,7 +22,7 @@ frontend and backend source code respositories:
     for frontend and backend, build images and push them to your registry. 
 
     for frontend: 
-    
+
         cd frontend/308_frontend
 
         docker build -t vegan-eats-frontend .
@@ -51,4 +51,4 @@ apply deployments and services:
 
     kubectl apply -f mongo-deployment.yaml
 
-
+the frontend should be accessible at http://127.0.0.1:30000/
