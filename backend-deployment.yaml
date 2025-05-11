@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: vegan-eats-backend
-          image: <yourdockeraccountname>/vegan-eats-backend:latest
+          image: us-central1-docker.pkg.dev/cs436termprojectgroup9/images436/vegan-eats-backend:latest
           ports:
             - containerPort: 5000
           envFrom:

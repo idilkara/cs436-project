@@ -14,12 +14,12 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: <yourdockeraccountname>/vegan-eats-frontend:latest
+          image: us-central1-docker.pkg.dev/cs436termprojectgroup9/images436/vegan-eats-frontend:latest
           ports:
             - containerPort: 80
           env:
             - name: BACKEND_URL
-              value: "/backend"
+              value: "http://backend" 
 ---
 apiVersion: v1
 kind: Service
@@ -32,5 +32,5 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 80
-      nodePort: 30000 # Choose an available port above 30000
-  type: NodePort  # Use LoadBalancer for cloud environments, or ClusterIP for internal
+      # nodePort: 30000 # Choose an available port above 30000
+  type: LoadBalancer   # Use LoadBalancer for cloud environments, or ClusterIP for internal

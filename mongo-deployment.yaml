@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: mongo
-          image: mongo:latest
+          image: us-central1-docker.pkg.dev/cs436termprojectgroup9/images436/mongo:latest 
           ports:
             - containerPort: 27017
 ---
