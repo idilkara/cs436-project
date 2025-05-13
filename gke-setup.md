@@ -63,7 +63,7 @@ build the images for frontend and backend if you have not done that, then run th
 
     kubectl apply -f backend-secret.yaml
 
-    kubectl apply -f backend-deploymnet.yaml
+    kubectl apply -f backend-deployment.yaml
 
     kubectl apply -f frontend-deployment.yaml
 

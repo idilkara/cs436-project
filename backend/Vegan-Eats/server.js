@@ -23,7 +23,7 @@ const allowedOrigins = [
   'http://localhost:8080' // ✅ add this
 
 ];
-
+console.log('MONGO_URI:', process.env.MONGO_URI);
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log('Database connected'))
