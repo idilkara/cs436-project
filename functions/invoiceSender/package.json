@@ -1,0 +1,10 @@
+{
+    "name": "invoiceSender",
+    "version": "1.0.0",
+    "main": "index.js",
+    "dependencies": {
+      "pdfkit": "^0.12.3",
+      "nodemailer": "^6.9.1",
+      "cors": "^2.8.5"
+    }
+  }

@@ -8,3 +8,4 @@ data:
   EMAIL_PORT: "587"
   EMAIL_USER: "veganeatsshop@gmail.com"
   EMAIL_PASS: "kulzrltaitihweyv"
+  PAYMENT_VALIDATE_URL: "https://paymentvalidate-rcr6msvo5q-uc.a.run.app"

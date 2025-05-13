@@ -96,7 +96,7 @@ const PlaceOrder = () => {
       const { transactionId } = paymentResponse.data;
   
       // Step 3: Generate and send invoice
-      await axios.post(`${backendUrl}/api/payment/generate-invoice`, {
+      /*await axios.post(`${backendUrl}/api/payment/generate-invoice`, {
         user: {
           name: shippingInfo.name,
           email: userEmail, // Use email from localStorage
@@ -108,6 +108,8 @@ const PlaceOrder = () => {
         },
         transactionId,
       });
+      */
+      
   
       // Clear the cart and navigate to the success page with order data
       clearCart();
