@@ -30,7 +30,7 @@
 
         docker build -t vegan-eats-backend .
 
-        docker tag vegan-eats-backend:latest <yourdockeraccountname>/vegan-eats-backend:latest
+        docker tag vegan-eats-backend:latest eudyll/vegan-eats-backend:latest
 
     based on <yourdockeraccountname>, change the container image path in deployment.yaml
 

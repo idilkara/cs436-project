@@ -6,6 +6,8 @@ const axios = require('axios');
 router.post('/mock-payment', async (req, res) => {
     try {
       const cfUrl = process.env.PAYMENT_VALIDATE_URL;
+      console.log('CF URL', cfUrl);
+      console.log('CF request body', req.body);
       const { data, status } = await axios.post(cfUrl, req.body);
       res.status(status).json(data);
     } catch (err) {
