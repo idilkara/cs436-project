@@ -1,8 +1,19 @@
 const express = require('express');
-const { mockPayment, generateInvoice } = require('../Controller/paymentController');
 const router = express.Router();
+const axios = require('axios');
 
-router.post('/mock-payment', mockPayment);
-router.post('/generate-invoice', generateInvoice);
 
+router.post('/mock-payment', async (req, res) => {
+    try {
+      const cfUrl = process.env.PAYMENT_VALIDATE_URL;
+      const { data, status } = await axios.post(cfUrl, req.body);
+      res.status(status).json(data);
+    } catch (err) {
+      console.error('CF error', err.response?.data || err.message);
+      res.status(err.response?.status || 500)
+         .json({ error: err.response?.data?.error || err.message });
+    }
+  });
+
+ 
 module.exports = router;

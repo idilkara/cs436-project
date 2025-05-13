@@ -6,7 +6,7 @@ const creditCardType = require('credit-card-type');
 const User = require('../Models/User'); 
 
 // Mock Payment
-exports.mockPayment = async (req, res) => {
+/*exports.mockPayment = async (req, res) => {
     const paymentSchema = Joi.object({
         nameOnCard: Joi.string().required(),
         cardNumber: Joi.string().required(),
@@ -142,5 +142,5 @@ exports.generateInvoice = async (req, res) => {
     } catch (error) {
         console.error('Error generating invoice:', error);
         res.status(500).json({ message: 'Internal Server Error', error: error.message });
-    }
-};
+    }        
+};*/
