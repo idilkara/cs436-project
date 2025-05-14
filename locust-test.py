@@ -1,35 +1,31 @@
+# locust-test.py
 from locust import HttpUser, SequentialTaskSet, task, between, events
+from locust.exception import StopUser
 import random
 
-# use one of your real test accounts
-TEST_EMAIL    = "nil.sarisik@sabanciuniv.edu"
-TEST_PASSWORD = "nil"
+TEST_EMAIL    = "12312@123"
+TEST_PASSWORD = "123"
 
 class FullUserFlow(SequentialTaskSet):
 
     def on_start(self):
-        # 1) Login and grab accessToken
+        # 1) Login and store JWT
         resp = self.client.post(
             "/api/users/login",
-            json={ "email": TEST_EMAIL, "password": TEST_PASSWORD },
+            json={"email": TEST_EMAIL, "password": TEST_PASSWORD},
             name="Login"
         )
         if resp.status_code != 200:
-            events.quitting.fire(reason=f"Login failed ({resp.status_code})")
+            raise StopUser(f"Login failed ({resp.status_code})")
         data = resp.json()
         token = data.get("accessToken")
         if not token:
-            events.quitting.fire(reason="Login response missing accessToken")
+            raise StopUser("Login response missing accessToken")
+        self.client.headers.update({"Authorization": f"Bearer {token}"})
 
-        # attach JWT to all future requests
-        self.client.headers.update({ "Authorization": f"Bearer {token}" })
-
-        # 2) fetch product list for later steps
+        # 2) pre-fetch product list
         r = self.client.get("/api/products", name="List Products")
-        if r.status_code == 200:
-            self.products = r.json()
-        else:
-            self.products = []
+        self.products = r.json() if r.status_code == 200 else []
 
     @task
     def view_random_product(self):
@@ -45,7 +41,7 @@ class FullUserFlow(SequentialTaskSet):
         p = random.choice(self.products)
         self.client.post(
             "/api/cart/add",
-            json={ "productId": p["_id"], "quantity": 1 },
+            json={"productId": p["_id"], "quantity": 1},
             name="Add To Cart"
         )
 
@@ -55,13 +51,12 @@ class FullUserFlow(SequentialTaskSet):
 
     @task
     def mock_payment(self):
-        # needs full card details to pass your Joi schema  [oai_citation:0‡paymentController.js](file-service://file-VRsCgyVDM6A8bpvjb8eMvq)
         payment_payload = {
             "nameOnCard":    "Load Tester",
-            "cardNumber":    "4111111111111111",   # a valid Visa test number
-            "expiry":        "12/30",              # MM/YY format
-            "cvv":           "123",                # exactly 3 digits
-            "amount":        1099                  # positive number
+            "cardNumber":    "4111111111111111",
+            "expiry":        "12/30",
+            "cvv":           "123",
+            "amount":        1099
         }
         self.client.post(
             "/api/payment/mock-payment",
@@ -80,12 +75,11 @@ class FullUserFlow(SequentialTaskSet):
         }
         self.client.post(
             "/api/orders/place",
-            json={ "shippingInfo": shipping },
+            json={"shippingInfo": shipping, "paymentMethodId": "pm_card_visa"},
             name="Place Order"
         )
 
 class WebsiteUser(HttpUser):
-    # point Locust at your frontend/load-balancer which proxies /backend → your Express app
-    host = "http://34.122.214.213/backend"
+    host = "http://34.122.214.213"
     tasks = [FullUserFlow]
     wait_time = between(1, 3)
