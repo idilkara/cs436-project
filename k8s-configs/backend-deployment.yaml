@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      imagePullSecrets:
+        - name: gcr-secret
+      containers:
+        - name: vegan-eats-backend # Ensure this matches your container name
+          image: us-central1-docker.pkg.dev/cs436termprojectgroup9-459819/images436/vegan-eats-backend:latest # Ensure this is your correct image tag
+          ports:
+            - containerPort: 5000 
+          # ADDED: Explicitly define MONGO_URI from ConfigMap.
+          # This definition takes precedence over the same key in envFrom.
+          env:
+            - name: MONGO_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config # Referencing the backend-config ConfigMap
+                  key: MONGO_URI       # Referencing the MONGO_URI key within the ConfigMap
+
+          # KEEP envFrom for other variables from ConfigMap and Secret.
+          # MONGO_URI from backend-secrets will still be loaded via envFrom,
+          # but the 'env' definition above overrides it for the container.
+          envFrom:
+            - configMapRef:
+                name: backend-config
+            - secretRef:
+                name: backend-secrets
+
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "500m"
+            limits:
+              memory: "512Mi"
+              cpu: "1"
+
+--- 
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+spec:
+  selector:
+    app: backend
+  ports:
+    - protocol: TCP
+      port: 5000
+      targetPort: 5000
+  type: ClusterIP # Or LoadBalancer, NodePort depending on your needs

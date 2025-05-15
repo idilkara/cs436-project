@@ -1,15 +1,80 @@
-frontend and backend source code respositories: 
+# Vegan Eats - Cloud-Native E-Commerce Platform
 
-    https://github.com/cemrekkandemir/Vegan-Eats.git
+## Project Overview
+Vegan Eats is a cloud-native e-commerce platform built for CS436 Cloud Computing. The application demonstrates modern cloud architecture principles, utilizing microservices, containerization, and cloud-managed services.
 
-    https://github.com/nilsarisi/308_frontend.git
+## Cloud Architecture
 
-## to save the changes in the frontend before building new image
+### Infrastructure Components
+- **Kubernetes Orchestration**
+  - Google Kubernetes Engine (GKE) for container orchestration
+  - Horizontal Pod Autoscaling for dynamic scaling
+  - LoadBalancer service type for external access
+  - ConfigMaps and Secrets for configuration management
 
-    npm run build
+- **Container Registry**
+  - Google Artifact Registry for container image management
+  - Automated container builds and deployments
+  - Version control and image tagging
 
-## to run the whole application, frontend-backend and mongodb run
+- **Database Layer**
+  - MongoDB deployment on VM
+  - Persistent SSD for data persistence
+  - Database replication for high availability
 
-    docker-compose up --build
+- **Cloud Functions (Serverless Components)**
+  - `invoiceSender`: Event-driven invoice generation
+  - `paymentValidate`: Serverless payment processing
+  - Pub/Sub integration for asynchronous communication
 
-    go to localhost:8080
+### Application Components
+
+#### Frontend (React/Vite)
+- https://github.com/nilsarisi/308_frontend.git
+- Containerized React application
+- Nginx-based reverse proxy
+- Multiple specialized admin interfaces
+- Deployed as Kubernetes pods with rolling updates
+
+#### Backend (Node.js)
+- https://github.com/cemrekkandemir/Vegan-Eats.git
+- Microservices architecture
+- RESTful API containerized in Docker
+- Horizontal scaling based on CPU/Memory metrics
+- Health checks and readiness probes
+
+## Deployment Infrastructure
+
+### 1. Local Development Environment
+- Docker Compose for local service orchestration
+- Minikube for local Kubernetes development
+- Local MongoDB instance via Docker
+- See [Local Setup Guide](./local-setup.md)
+
+### 2. Production Cloud Deployment
+- **Google Cloud Platform (GCP)**
+  - GKE cluster with node autoscaling
+  - Cloud Load Balancing
+  - Cloud Monitoring and Logging
+  - IAM for access control
+  - See [GKE Deployment Guide](./gke-deployment.md)
+
+## Performance and Reliability
+- Load testing with Locust (`locust-test.py`)
+- Kubernetes liveness and readiness probes
+- Automated scaling policies
+- Network policies for security
+
+## Project Structure
+```
+project/
+├── k8s-configs/           # Kubernetes manifests
+│   ├── backend-deployment.yaml
+│   ├── frontend-deployment.yaml
+│   └── mongo-deployment.yaml
+├── backend/               # Containerized backend service
+├── frontend/             # Containerized frontend 
+├── functions/            # Cloud Functions
+└── docker-compose.yml    # Local development setup
+```
+

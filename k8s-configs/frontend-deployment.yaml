@@ -12,9 +12,11 @@ spec:
       labels:
         app: frontend
     spec:
+      imagePullSecrets:
+        - name: gcr-secret
       containers:
         - name: frontend
-          image: us-central1-docker.pkg.dev/cs436termprojectgroup9/images436/vegan-eats-frontend:latest
+          image: us-central1-docker.pkg.dev/cs436termprojectgroup9-459819/images436/vegan-eats-frontend:latest
           ports:
             - containerPort: 80
           env:

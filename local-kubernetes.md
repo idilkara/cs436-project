@@ -40,7 +40,7 @@ apply deployments and services:
 
     kubectl apply -f backend-secret.yaml
 
-    kubectl apply -f backend-deploymnet.yaml
+    kubectl apply -f backend-deployment.yaml
 
     kubectl apply -f frontend-deployment.yaml
 

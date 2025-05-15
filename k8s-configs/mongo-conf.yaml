@@ -14,6 +14,6 @@ metadata:
   name: mongodb-service
 subsets:
 - addresses:
-  - ip: 10.128.0.50 #<VM_INTERNAL_IP>
+  - ip: 10.128.0.6 #<VM_INTERNAL_IP>
   ports:
   - port: 27017

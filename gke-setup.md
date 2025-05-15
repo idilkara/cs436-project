@@ -1,75 +1,119 @@
-#  Kubernetes setup using Google Cloud CLI 
+# Google Kubernetes Engine (GKE) Deployment Guide
 
-### Sign In and Set Configuration
+## Prerequisites
+- Google Cloud Platform (GCP) account
+- Google Cloud CLI (`gcloud`) installed
+- Docker installed
+- kubectl installed
 
-    gcloud auth login
+## Setup Steps
 
-    gcloud config set project <project>
+### 1. Initial GCP Configuration
 
-    gcloud config set compute/zone <zone>
+1. Authenticate with Google Cloud:
+```bash
+gcloud auth login
+```
 
-### Grant Artifact Registry roles and access
+2. Configure project and zone:
+```bash
+gcloud config set project <your-project-id>
+gcloud config set compute/zone <your-preferred-zone>
+```
 
-    gcloud projects add-iam-policy-binding <project> --member=user:<useremail> --role=roles/artifactregistry.writer
+### 2. Configure Artifact Registry Access
 
-    gcloud projects add-iam-policy-binding <project> --member=user:<useremail> --role=roles/artifactregistry.reader
+1. Grant necessary IAM roles:
+```bash
+# Grant Artifact Registry Writer role
+gcloud projects add-iam-policy-binding <project-id> \
+    --member=user:<your-email> \
+    --role=roles/artifactregistry.writer
 
+# Grant Artifact Registry Reader role
+gcloud projects add-iam-policy-binding <project-id> \
+    --member=user:<your-email> \
+    --role=roles/artifactregistry.reader
+```
 
-### Authenticate Docker with Artifact Registry
+2. Configure Docker authentication:
+```bash
+gcloud auth configure-docker <region>-docker.pkg.dev
+```
 
-    gcloud auth configure-docker <zone>-docker.pkg.dev
+### 3. Push Docker Images to Artifact Registry
 
-    tag the images and push them to google cloud artifact registry
+1. Tag your Docker images:
+```bash
+# Tag frontend image
+docker tag <your-frontend-image>:latest \
+    <region>-docker.pkg.dev/<project-id>/<registry-repo>/vegan-eats-frontend:latest
 
-### Tag and Push Docker Images
+# Tag backend image
+docker tag <your-backend-image>:latest \
+    <region>-docker.pkg.dev/<project-id>/<registry-repo>/vegan-eats-backend:latest
 
-build the images for frontend and backend if you have not done that, then run the following
+# Optional: Tag MongoDB image
+docker tag mongo:latest \
+    <region>-docker.pkg.dev/<project-id>/<registry-repo>/mongo:latest
+```
 
-#### tag
+2. Push images to Artifact Registry:
+```bash
+# Push frontend
+docker push <region>-docker.pkg.dev/<project-id>/<registry-repo>/vegan-eats-frontend:latest
 
-    docker tag <dockerusername>/vegan-eats-frontend:latest us-central1-docker.pkg.dev/<project>/<registry_repository>/vegan-eats-frontend:latest
+# Push backend
+docker push <region>-docker.pkg.dev/<project-id>/<registry-repo>/vegan-eats-backend:latest
 
-    docker tag <dockerusername>/vegan-eats-backend:latest us-central1-docker.pkg.dev/<project>/<registry_repository>/vegan-eats-backend:latest
+# Optional: Push MongoDB
+docker push <region>-docker.pkg.dev/<project-id>/<registry-repo>/mongo:latest
+```
 
-#### push 
+### 4. Create and Configure GKE Cluster
 
-    docker push us-central1-docker.pkg.dev/<project>/<registry_repository>/vegan-eats-frontend:latest
+1. Create the cluster:
+```bash
+gcloud container clusters create "my-app-cluster" \
+    --region us-central1 \
+    --num-nodes 1 \
+    --machine-type e2-standard-4 \
+    --enable-autoscaling \
+    --min-nodes 1 \
+    --max-nodes 3
+```
 
-    docker push us-central1-docker.pkg.dev/<project>/<registry_repository>/vegan-eats-backend:latest
+2. Verify cluster status:
+```bash
+kubectl top nodes
+```
 
-### optionally put mongo db as part of the cluster - configure the urls based on this too. 
+3. Configure firewall rules:
+```bash
+gcloud compute firewall-rules create allow-gke-traffic \
+    --allow=tcp:80,tcp:443 \
+    --description="Allow HTTP/HTTPS to GKE" \
+    --target-tags=gke-my-app-cluster
+```
 
-    docker pull mongo:latest
+### 5. Deploy Application to GKE
 
-    tag mongo:latest us-central1-docker.pkg.dev/cs436termprojectgroup9/images436/mongo:latest
+1. Apply Kubernetes configurations:
+```bash
+kubectl apply -f backend-configmap.yaml
+kubectl apply -f backend-secret.yaml
+kubectl apply -f backend-deployment.yaml
+kubectl apply -f frontend-deployment.yaml
+kubectl apply -f mongo-deployment.yaml  # Optional if using managed MongoDB
+```
 
-    docker push us-central1-docker.pkg.dev/cs436termprojectgroup9/images436/mongo:latest
+2. Verify deployment:
+```bash
+kubectl get pods
+kubectl get services
+```
 
-### Create a GKE Cluster
-
-    gcloud container clusters create "my-app-cluster"   --region us-central1  --num-nodes 1 --machine-type e2-standard-4 --enable-autoscaling --min-nodes 1 --max-nodes 3
-
-#### verify
-
-    kubectl top nodes
-
-### configute firewall for http/https access
-
-    gcloud compute firewall-rules create allow-gke-traffic --allow=tcp:80,tcp:443 --description="Allow HTTP/HTTPS to GKE" --target-tags=gke-my-app-cluster
-
-### adjust the manifest files if required then run the following to run pods
-
-    kubectl apply -f backend-configmap.yaml
-
-    kubectl apply -f backend-secret.yaml
-
-    kubectl apply -f backend-deployment.yaml
-
-    kubectl apply -f frontend-deployment.yaml
-
-    (optionally) kubectl apply -f mongo-deployment.yaml 
-
-the frontend should then be accessible at the external-ip you see after executing this command
-
-    kubectl get service frontend
-
+3. Get frontend service external IP, you can use this to access the frontend:
+```bash
+kubectl get service frontend
+```
