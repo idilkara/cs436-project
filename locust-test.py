@@ -1,53 +1,86 @@
-# locust-test.py
-from locust import HttpUser, SequentialTaskSet, task, between, events
-from locust.exception import StopUser
+import uuid
 import random
-
-TEST_EMAIL    = "12312@123"
-TEST_PASSWORD = "123"
+from locust import HttpUser, SequentialTaskSet, task, between, events, StopUser
 
 class FullUserFlow(SequentialTaskSet):
-
     def on_start(self):
-        # 1) Login and store JWT
-        resp = self.client.post(
-            "/api/users/login",
-            json={"email": TEST_EMAIL, "password": TEST_PASSWORD},
-            name="Login"
-        )
-        if resp.status_code != 200:
-            raise StopUser(f"Login failed ({resp.status_code})")
-        data = resp.json()
-        token = data.get("accessToken")
-        if not token:
-            raise StopUser("Login response missing accessToken")
-        self.client.headers.update({"Authorization": f"Bearer {token}"})
+        # 1) generate unique signup creds
+        uid = uuid.uuid4().hex[:8]
+        self.email    = f"user_{uid}@loadtest.local"
+        self.password = f"Pwd!{uid}"
 
-        # 2) pre-fetch product list
-        r = self.client.get("/api/products", name="List Products")
-        self.products = r.json() if r.status_code == 200 else []
+        # 2) SIGN UP
+        signup = self.client.post(
+            "/api/users/signup",
+            json={
+                "name":    f"LoadTester{uid}",
+                "email":   self.email,
+                "password": self.password,
+                "address": "123 Load St"
+            },
+            name="Signup",
+            catch_response=True
+        )
+        if signup.status_code not in (200,201):
+            signup.failure(f"Signup failed: {signup.status_code}")
+            events.quitting.fire(reason="Signup failed")
+            return
+
+        # 3) LOGIN
+        login = self.client.post(
+            "/api/users/login",
+            json={ "email": self.email, "password": self.password },
+            name="Login",
+            catch_response=True
+        )
+        if login.status_code != 200:
+            login.failure(f"Login failed: {login.status_code}")
+            events.quitting.fire(reason="Login failed")
+            return
+        token = login.json().get("accessToken")
+        if not token:
+            login.failure("Login succeeded but no accessToken")
+            events.quitting.fire(reason="Login no token")
+            return
+
+        # attach JWT header
+        self.client.headers.update({ "Authorization": f"Bearer {token}" })
+
+        # 4) preload products
+        resp = self.client.get("/api/products", name="List Products", catch_response=True)
+        if resp.status_code != 200:
+            resp.failure(f"List products failed: {resp.status_code}")
+            self.products = []
+        else:
+            self.products = resp.json()
 
     @task
     def view_random_product(self):
         if not self.products:
             return
         p = random.choice(self.products)
-        self.client.get(f"/api/products/{p['_id']}", name="Get Product")
+        with self.client.get(f"/api/products/{p['_id']}",
+                             name="Get Product", catch_response=True) as r:
+            if r.status_code != 200:
+                r.failure(f"Get product failed: {r.status_code}")
 
     @task
     def add_to_cart(self):
         if not self.products:
             return
         p = random.choice(self.products)
-        self.client.post(
-            "/api/cart/add",
-            json={"productId": p["_id"], "quantity": 1},
-            name="Add To Cart"
-        )
+        with self.client.post("/api/cart/add",
+                              json={"productId": p["_id"], "quantity": 1},
+                              name="Add To Cart", catch_response=True) as r:
+            if r.status_code != 200:
+                r.failure(f"Add to cart failed: {r.status_code}")
 
     @task
     def view_cart(self):
-        self.client.get("/api/cart/view", name="View Cart")
+        with self.client.get("/api/cart/view",
+                             name="View Cart", catch_response=True) as r:
+            if r.status_code != 200:
+                r.failure(f"View cart failed: {r.status_code}")
 
     @task
     def mock_payment(self):
@@ -73,11 +106,15 @@ class FullUserFlow(SequentialTaskSet):
             "postalCode": "00000",
             "country":    "Testland"
         }
-        self.client.post(
-            "/api/orders/place",
-            json={"shippingInfo": shipping, "paymentMethodId": "pm_card_visa"},
-            name="Place Order"
-        )
+        with self.client.post("/api/orders/place",
+                              json={"shippingInfo": shipping},
+                              name="Place Order",
+                              catch_response=True) as r:
+            if r.status_code not in (200, 201):
+                r.failure(f"Place order failed: {r.status_code}")
+
+        # now stop this user
+        raise StopUser()
 
 class WebsiteUser(HttpUser):
     host = "http://34.122.214.213"
