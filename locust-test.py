@@ -1,7 +1,7 @@
 import uuid
 import random
-from locust import HttpUser, SequentialTaskSet, task, between, events, StopUser
-
+from locust import HttpUser, SequentialTaskSet, task, between, events
+from locust.exception import StopUser
 class FullUserFlow(SequentialTaskSet):
     def on_start(self):
         # 1) generate unique signup creds
@@ -117,6 +117,6 @@ class FullUserFlow(SequentialTaskSet):
         raise StopUser()
 
 class WebsiteUser(HttpUser):
-    host = "http://34.122.214.213"
+    host = "http://35.188.187.80:5000"
     tasks = [FullUserFlow]
     wait_time = between(1, 3)
