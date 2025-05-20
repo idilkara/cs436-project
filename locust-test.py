@@ -4,13 +4,16 @@ from locust import HttpUser, SequentialTaskSet, task, between, events
 from locust.exception import StopUser
 class FullUserFlow(SequentialTaskSet):
     def on_start(self):
+        # initialize products list to avoid missing attribute
+        self.products = []
+
         # 1) generate unique signup creds
         uid = uuid.uuid4().hex[:8]
         self.email    = f"user_{uid}@loadtest.local"
         self.password = f"Pwd!{uid}"
 
         # 2) SIGN UP
-        signup = self.client.post(
+        with self.client.post(
             "/api/users/signup",
             json={
                 "name":    f"LoadTester{uid}",
@@ -20,28 +23,28 @@ class FullUserFlow(SequentialTaskSet):
             },
             name="Signup",
             catch_response=True
-        )
-        if signup.status_code not in (200,201):
-            signup.failure(f"Signup failed: {signup.status_code}")
-            events.quitting.fire(reason="Signup failed")
-            return
+        ) as signup:
+            if signup.status_code not in (200,201):
+                signup.failure(f"Signup failed: {signup.status_code}")
+                events.quitting.fire(reason="Signup failed")
+                return
 
         # 3) LOGIN
-        login = self.client.post(
+        with self.client.post(
             "/api/users/login",
             json={ "email": self.email, "password": self.password },
             name="Login",
             catch_response=True
-        )
-        if login.status_code != 200:
-            login.failure(f"Login failed: {login.status_code}")
-            events.quitting.fire(reason="Login failed")
-            return
-        token = login.json().get("accessToken")
-        if not token:
-            login.failure("Login succeeded but no accessToken")
-            events.quitting.fire(reason="Login no token")
-            return
+        ) as login:
+            if login.status_code != 200:
+                login.failure(f"Login failed: {login.status_code}")
+                events.quitting.fire(reason="Login failed")
+                return
+            token = login.json().get("accessToken")
+            if not token:
+                login.failure("Login succeeded but no accessToken")
+                events.quitting.fire(reason="Login no token")
+                return
 
         # attach JWT header
         self.client.headers.update({ "Authorization": f"Bearer {token}" })
@@ -114,7 +117,7 @@ class FullUserFlow(SequentialTaskSet):
                 r.failure(f"Place order failed: {r.status_code}")
 
         # now stop this user
-        raise StopUser()
+        # raise StopUser()
 
 class WebsiteUser(HttpUser):
     host = "http://35.188.187.80:5000"
