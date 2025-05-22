@@ -22,7 +22,7 @@ Vegan Eats is a cloud-native e-commerce platform built for CS436 Cloud Computing
   - Persistent SSD for data persistence
 
 - **Cloud Functions (Serverless Components)**
-  - `paymentValidate`: Serverless payment processing
+  - `paymentValidate`: Serverless payment processing [function code](./functions/paymentValidate/)
 
 ### Application Components
 
@@ -67,6 +67,7 @@ project/
 │   ├── backend-deployment.yaml
 │   ├── frontend-deployment.yaml
 │   └── mongo-deployment.yaml
+|
 ├── backend/               # Containerized backend service
 ├── frontend/             # Containerized frontend 
 ├── functions/            # Cloud Functions
