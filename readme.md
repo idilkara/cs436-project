@@ -1,7 +1,7 @@
 # Vegan Eats - Cloud-Native E-Commerce Platform
 
 ## Project Overview
-Vegan Eats is a cloud-native e-commerce platform built for CS436 Cloud Computing. The application demonstrates modern cloud architecture principles, utilizing microservices, containerization, and cloud-managed services.
+Vegan Eats is a cloud-native e-commerce platform built for CS436 Cloud Computing. The application demonstrates modern cloud architecture principles, utilizing containerization, and cloud-managed services.
 
 ## Cloud Architecture
 
@@ -9,7 +9,7 @@ Vegan Eats is a cloud-native e-commerce platform built for CS436 Cloud Computing
 - **Kubernetes Orchestration**
   - Google Kubernetes Engine (GKE) for container orchestration
   - Horizontal Pod Autoscaling for dynamic scaling
-  - LoadBalancer service type for external access
+  - LoadBalancer service type for internal access
   - ConfigMaps and Secrets for configuration management
 
 - **Container Registry**
@@ -20,49 +20,44 @@ Vegan Eats is a cloud-native e-commerce platform built for CS436 Cloud Computing
 - **Database Layer**
   - MongoDB deployment on VM
   - Persistent SSD for data persistence
-  - Database replication for high availability
 
 - **Cloud Functions (Serverless Components)**
-  - `invoiceSender`: Event-driven invoice generation
-  - `paymentValidate`: Serverless payment processing
-  - Pub/Sub integration for asynchronous communication
+  - `paymentValidate`: Serverless payment processing [function code](./functions/paymentValidate/)
 
 ### Application Components
 
 #### Frontend (React/Vite)
 - https://github.com/nilsarisi/308_frontend.git
-- Containerized React application
+- Containerized React application [Dockerfile](./frontend/308_frontend/Dockerfile)
 - Nginx-based reverse proxy
 - Multiple specialized admin interfaces
 - Deployed as Kubernetes pods with rolling updates
 
 #### Backend (Node.js)
 - https://github.com/cemrekkandemir/Vegan-Eats.git
-- Microservices architecture
-- RESTful API containerized in Docker
-- Horizontal scaling based on CPU/Memory metrics
+- RESTful API containerized in Docker [Dockerfile](./backend/Vegan-Eats/Dockerfile)
+
+- Horizontal scaling based on CPU/Memory metrics [HPA configuration](./k8s-configs/hpa.yaml)
 - Health checks and readiness probes
 
 ## Deployment Infrastructure
 
 ### 1. Local Development Environment
-- Docker Compose for local service orchestration
+- Docker Compose for local service orchestration [see docker-compose](./docker-compose.yaml)
 - Minikube for local Kubernetes development
 - Local MongoDB instance via Docker
-- See [Local Setup Guide](./local-setup.md)
+- See [Local Setup Guide](./local-kubernetes.md)
 
 ### 2. Production Cloud Deployment
 - **Google Cloud Platform (GCP)**
-  - GKE cluster with node autoscaling
-  - Cloud Load Balancing
-  - Cloud Monitoring and Logging
-  - IAM for access control
-  - See [GKE Deployment Guide](./gke-deployment.md)
+  - GKE cluster with node autoscaling, see [GKE Deployment Guide](./gke-setupt.md) and the [folder](./k8s-configs/)
+  - Database on a vitrual machine with a linux server
+  - You can create a VM and run the shell script [vm-db.sh] (./vm-db.sh)
 
 ## Performance and Reliability
-- Load testing with Locust (`locust-test.py`)
+- Testing with Locust (`locust-test.py`) while also changing the cloud architecture system parameters. (we talked about this in out presentation)
 - Kubernetes liveness and readiness probes
-- Automated scaling policies
+- Automated scaling policicies
 - Network policies for security
 
 ## Project Structure
@@ -72,6 +67,7 @@ project/
 │   ├── backend-deployment.yaml
 │   ├── frontend-deployment.yaml
 │   └── mongo-deployment.yaml
+|
 ├── backend/               # Containerized backend service
 ├── frontend/             # Containerized frontend 
 ├── functions/            # Cloud Functions
