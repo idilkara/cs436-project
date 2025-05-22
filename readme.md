@@ -49,15 +49,15 @@ Vegan Eats is a cloud-native e-commerce platform built for CS436 Cloud Computing
 - Docker Compose for local service orchestration
 - Minikube for local Kubernetes development
 - Local MongoDB instance via Docker
-- See [Local Setup Guide](./local-setup.md)
+- See [Local Setup Guide](./local-kubernetes.md)
 
 ### 2. Production Cloud Deployment
 - **Google Cloud Platform (GCP)**
   - GKE cluster with node autoscaling
-  - Cloud Load Balancing
-  - Cloud Monitoring and Logging
-  - IAM for access control
-  - See [GKE Deployment Guide](./gke-deployment.md)
+  - See [GKE Deployment Guide](./gke-setupt.md)
+
+  - Database on a vitrual machine with a linux server
+  - You can create a VM and run the shell script [vm-db.sh] (./vm-db.sh)
 
 ## Performance and Reliability
 - Load testing with Locust (`locust-test.py`)
