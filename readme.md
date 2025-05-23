@@ -1,9 +1,9 @@
 # Vegan Eats - Cloud-Native E-Commerce Platform
 
-<div style="display: flex; flex-direction: row; gap: 20px;">
-    <img src="./homepage.png" width="1000" alt="Homepage" />
-    <img src="./order.png" width="1000" alt="Order Completed" />
-</div>
+
+<img src="./homepage.png" width="1000" alt="Homepage" />
+
+<img src="./order.png" width="1000" alt="Order Completed" />
 
 
 ## Project Overview
