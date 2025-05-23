@@ -1,7 +1,7 @@
 # Vegan Eats - Cloud-Native E-Commerce Platform
 
 
-<img src="./homepage.png" width="1000" alt="Homepage" />
+<img src="./homepage.png" width="1000" alt="Homepage" style="margin-bottom: 20px;" />
 
 <img src="./order.png" width="1000" alt="Order Completed" />
 
