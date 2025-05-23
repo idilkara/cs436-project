@@ -2,7 +2,7 @@
 
 
 <img src="./homepage.png" width="1000" alt="Homepage" />
-<br><br>
+
 <img src="./order.png" width="1000" alt="Order Completed" />
 
 
