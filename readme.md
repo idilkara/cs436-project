@@ -1,5 +1,11 @@
 # Vegan Eats - Cloud-Native E-Commerce Platform
 
+<div style="display: flex; flex-direction: row;">
+    <img src="./homepage.png" width="400" alt="Homepage" />
+    <img src="./order.png" width="400" alt="Order Completed" />
+</div>
+
+
 ## Project Overview
 Vegan Eats is a cloud-native e-commerce platform built for CS436 Cloud Computing. The application demonstrates modern cloud architecture principles, utilizing containerization, and cloud-managed services.
 
@@ -76,4 +82,4 @@ project/
 
 ## Testing
 
-Locust Testing details can be found under the tests/ folder 
+Locust Testing details and results can be found under the tests/ folder 
