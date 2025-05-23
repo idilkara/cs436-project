@@ -74,3 +74,6 @@ project/
 └── docker-compose.yml    # Local development setup
 ```
 
+## Testing
+
+Locust Testing details can be found under the tests/ folder 
