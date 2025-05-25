@@ -53,6 +53,10 @@ We started by creating a Virtual Machine (VM) instance for our database using GC
   - Run the custom setup script [`vm-db.sh`](setup-commands/vm-db.sh) to install MongoDB and configure it for remote access.
   - The script restores application data from a MongoDB Atlas backup, ensuring the database starts with the required data.
 
+- **Integration:**
+    - Update the mongoDB URL in the Kubernetes configmap [`backend-configmap.yaml`](k8s-configs/backend-configmap.yaml).
+    - If you started Kubernetes before this step, restart the backend pod to ensure it uses the new serverless endpoint.
+
 ---
 
 ## STEP 2: SERVERLESS SETUP
@@ -68,7 +72,7 @@ We separated the payment verification logic into a serverless function.
   - Allowed unauthenticated access.
 - Deployed the function to Google Cloud Run using the GCP dashboard.
 - **Integration:**  
-    - Updated the function URL in the Kubernetes configmap [`backend-configmap.yaml`](k8s-configs/backend-configmap.yaml).
+    - Update the function URL in the Kubernetes configmap [`backend-configmap.yaml`](k8s-configs/backend-configmap.yaml).
     - If you started Kubernetes before this step, restart the backend pod to ensure it uses the new serverless endpoint.
 
 ---
