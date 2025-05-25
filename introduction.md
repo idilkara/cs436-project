@@ -71,7 +71,7 @@ flowchart TB
     BE -- manage database 
         via MongoDB Protocol --> MongoDB
     BE -- for payment checks 
-        HTTPS/Webhook request --> Serverless
+        HTTP request --> Serverless
 
     %% Apply classes
     class FE frontend;

@@ -19,7 +19,7 @@ This repository includes:
     - [`README.md`](README.md) with step-by-step deployment and setup instructions.
         - Additional setup guides and command references in the [`setup-commands/`](setup-commands/) directory.
         - Additional overview of the repository in [`introduction.md`](introduction.md)
-    - A demnstration video of our working system is also available in this repository. 
+    - A demonstration [video](cs436_demo.mp4) of our working system is also available in this repository. 
 
 All files required to replicate the deployment and testing environment are included in this repository.
 
