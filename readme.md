@@ -23,7 +23,9 @@ This repository includes:
 All files required to replicate the deployment and testing environment are included in this repository.
 
 
-# STEP BY STEP DEPLOYMENT PROCESS
+# STEP BY STEP DEPLOYMENT PROCESS to REPLICATE OUR INITIAL SETUP
+
+We used multiple configurations for our experiments but for the step by step instructions we describe the instructins for our initial setup
 
 ## COMPONENT AND INFRASTRUCTURE MAPPING
 
@@ -117,7 +119,7 @@ We used Google Kubernetes Engine (GKE) for deploying the backend and frontend.
         ```
 
     - Build, Push and Tag Docker Images
-    
+
     - **Build the Docker image for frontend**
 
         ```sh
