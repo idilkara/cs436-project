@@ -151,7 +151,7 @@ We used Google Kubernetes Engine (GKE) for deploying the backend and frontend.
 
         ```sh
         docker push <region>-docker.pkg.dev/<project-id>/<registry-repo>/vegan-eats-frontend:latest
-        docker push <region>-docker.pkg.dev/<project-id>/<registry-repo>/vegan-eats-backend:late
+        docker push <region>-docker.pkg.dev/<project-id>/<registry-repo>/vegan-eats-backend:latest
         ```      
 
     - Update `backend-deployment.yaml` and `frontend-deployment.yaml` files with your corresponding image paths.
