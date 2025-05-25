@@ -216,7 +216,8 @@ We used Google Kubernetes Engine (GKE) for deploying the backend and frontend.
 
 The details of our experiments are in the [`tests/`](./tests/) folder. Please refer to the [`tests/README.md`](./tests/README.md) file for more details.
 
+We also showed that the experiments costed under 300$ trial budget.
+
 
 ---
 
-This process ensures each component is deployed on the appropriate infrastructure, with clear separation and integration between database, serverless, and Kubernetes-managed services.
