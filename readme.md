@@ -127,7 +127,9 @@ We used Google Kubernetes Engine (GKE) for deploying the backend and frontend.
             - Update `backend-deployment.yaml` and `frontend-deployment.yaml` files with your corresponding image paths.
 
     4. **Create and Configure GKE Cluster**
+
             - Create the cluster:
+
                 ```sh
                 gcloud container clusters create "my-app-cluster" \
                         --region us-central1 \
@@ -137,27 +139,34 @@ We used Google Kubernetes Engine (GKE) for deploying the backend and frontend.
                         --min-nodes 1 \
                         --max-nodes 3
                 ```
+
             - Verify cluster:
+
                 ```sh
                 kubectl top nodes
                 ```
+
             - Configure firewall:
+
                 ```sh
                 gcloud compute firewall-rules create allow-gke-traffic \
                         --allow=tcp:80,tcp:443 \
                         --description="Allow HTTP/HTTPS to GKE" \
                         --target-tags=gke-my-app-cluster
                 ```
+
     5. **Deploy Application to GKE**
             - Apply Kubernetes manifests:
+
                 ```sh
                 kubectl apply -f backend-configmap.yaml
                 kubectl apply -f backend-secret.yaml
                 kubectl apply -f backend-deployment.yaml
                 kubectl apply -f hpa.yaml
                 kubectl apply -f frontend-deployment.yaml
-                kubectl apply -f backend-locust-serve.yaml (Expose the backend port to external access for locust experiments)
+                kubectl apply -f backend-locust-serve.yaml 
                 ```
+
             - Verify deployment:
                 ```sh
                 kubectl get pods
@@ -170,11 +179,10 @@ We used Google Kubernetes Engine (GKE) for deploying the backend and frontend.
 
 ---
 
-**References:**
-- [vm-db.sh](setup-commands/vm-db.sh): Custom VM/MongoDB setup script  
-- [gke-setup.md](setup-commands/gke-setup.md): GKE deployment guide  
-- [local-kubernetes.md](setup-commands/local-kubernetes.md): Local Kubernetes and Docker image instructions  
-- [usefulcommands.md](setup-commands/usefulcommands.md): Handy GCP and Kubernetes commands  
+# REPRODUCIBILITY OF EXPERIMENTS
+
+The details of our experiments are in the [`tests/`](./tests/) folder. Please refer to the [`tests/readme.md`](./tests/readme.md) file for more details.
+
 
 ---
 
