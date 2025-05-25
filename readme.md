@@ -12,7 +12,7 @@ This repository includes:
     - Setup scripts for the VM and commands for creating the Kubernetes cluster are also provided in the same folder.
 
 - **Load Testing Scripts:**  
-    Locust scripts for performance and load testing, are in the tests folder.
+    Locust scripts for performance and load testing, are in the [`tests/`](./tests/) folder.
     This folder also includes the results we collected and th terminal commands we used to run the experiments.
 
 - **Documentation:**  
