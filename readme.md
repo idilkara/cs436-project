@@ -117,9 +117,7 @@ We used Google Kubernetes Engine (GKE) for deploying the backend and frontend.
         ```
 
     - Build, Push and Tag Docker Images
-
-    - **Frontend:**
-
+    
     - **Build the Docker image for frontend**
 
         ```sh
@@ -182,27 +180,28 @@ We used Google Kubernetes Engine (GKE) for deploying the backend and frontend.
         ```
 
     5. **Deploy Application to GKE**
-            - Apply Kubernetes manifests:
 
-                ```sh
-                kubectl apply -f backend-configmap.yaml
-                kubectl apply -f backend-secret.yaml
-                kubectl apply -f backend-deployment.yaml
-                kubectl apply -f hpa.yaml
-                kubectl apply -f frontend-deployment.yaml
-                kubectl apply -f backend-locust-serve.yaml 
-                ```
+    - Apply Kubernetes manifests:
 
-            - Verify deployment:
+        ```sh
+        kubectl apply -f backend-configmap.yaml
+        kubectl apply -f backend-secret.yaml
+        kubectl apply -f backend-deployment.yaml
+        kubectl apply -f hpa.yaml
+        kubectl apply -f frontend-deployment.yaml
+        kubectl apply -f backend-locust-serve.yaml 
+        ```
 
-                ```sh
-                kubectl get pods
-                kubectl get services
-                ```
-            - Get frontend service external IP to access the UI:
-                ```sh
-                kubectl get service frontend
-                ```
+    - Verify deployment:
+
+        ```sh
+        kubectl get pods
+        kubectl get services
+        ```
+    - Get frontend service external IP to access the UI:
+        ```sh
+        kubectl get service frontend
+        ```
 
 ---
 
