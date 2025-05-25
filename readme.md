@@ -1,165 +1,181 @@
-# Vegan Eats - Cloud-Native E-Commerce Platform
+# Repository Contents
+
+This repository includes:
+
+- **Application Source Code:**  
+    Source code for both backend and frontend components.
+    backend source code is in `backend/` folder
+    frontend source code is in `frontend/` folder
+
+- **Deployment Scripts and Manifests:**  
+    - Kubernetes YAML manifests for deploying services, configmaps, secrets, and autoscalers are in `k8s-configs/` folder
+    - Also the setup scripts for setting up the VM and the commadns for  creating the kubernetes cluster are given in the same folder.
+
+- **Load Testing Scripts:**  
+    Locust scripts for performance and load testing, are in the tests folder.
+    This folder also includes the results we collected and th terminal commands we used to run the experiments.
+
+- **Documentation:**  
+    - `README.md` with step-by-step deployment and setup instructions.
+    - Additional setup guides and command references in the `setup-commands/` directory. 
+
+All files required to replicate the deployment and testing environment are included in this repository.
 
 
-<img src="./homepage.png" width="1000" alt="Homepage" />
+# STEP BY STEP DEPLOYMENT PROCESS
 
-<img src="./order.png" width="1000" alt="Order Completed" />
+## COMPONENT AND INFRASTRUCTURE MAPPING
 
+- **DATABASE** → VM  
+- **BACKEND** → Kubernetes GKE  
+- **FRONTEND** → Kubernetes GKE  
+- **PAYMENT VERIFICATION** → Google Cloud Run  
 
-## Project Overview
-Vegan Eats is an e-commerce application that we used for our CS436 Cloud Computing term project. Under the project, we deployed application on the google cloud demonstrating modern cloud architecture principles, utilizing containerization, and cloud-managed services.
-
-## Application Architecture on the Cloud 
-
-```mermaid
 ---
-title: Cloud Architecture Diagram
+
+## STEP 1: DATABASE SETUP
+
+**3.1 Virtual Machine:**
+
+We started by creating a Virtual Machine (VM) instance for our database.  
+- **Configuration:**  
+  - Machine type: `e2-medium`
+  - Disk: 10GB standard persistent disk
+  - OS: Ubuntu 22.04 LTS  
+  - See [usefulcommands.md](setup-commands/usefulcommands.md) for commands to list and describe VMs.
+- **Firewall:**  
+  - Enabled HTTP and HTTPS connections.
+- **Setup:**  
+  - SSH into the VM.
+  - Run the custom setup script [`vm-db.sh`](setup-commands/vm-db.sh) to install MongoDB and configure it for remote access.
+  - The script restores application data from a MongoDB Atlas backup, ensuring the database starts with the required data.
+
 ---
 
-flowchart TB
+## STEP 2: SERVERLESS SETUP
 
+**Serverless:**
 
-    %% Define colors
-    classDef frontend fill:#e0f7fa,stroke:#00796b,stroke-width:2px;
-    classDef backend fill:#fff9c4,stroke:#fbc02d,stroke-width:2px;
-    classDef backend-muted fill:#fffde7,stroke:#ffe082,stroke-width:2px;
-    classDef mongodb fill:#f8bbd0,stroke:#ad1457,stroke-width:2px;
-    classDef serverless fill:#d1c4e9,stroke:#512da8,stroke-width:2px;
-    classDef user fill:#c8e6c9,stroke:#388e3c,stroke-width:2px;
-    classDef outer fill:#ffffff,stroke:#00796b,stroke-width:2px;
+We separated the payment verification logic into a serverless function.
+- **Development:**  
+  - Created the source code for the serverless function (mock payment validation).
+- **Deployment:**  
+  - Selected region: `us-central1`
+  - Runtime: `nodejs`
+  - Allowed unauthenticated access.
+  - Deployed the function to Google Cloud Run.
+- **Integration:**  
+  - Updated the function URL in the Kubernetes configmap `backend-configmap.yaml` .
+  - If you have started the kubernetes before this step, you can restart the backend pod to ensure it uses the new serverless endpoint.
 
-    subgraph "Kubernetes_Cluster"
-        subgraph POD1["Frontend Deployment"]
-            FE["Frontend Application Pod"]
-        end
-        FrontendService["Frontend Service"]
-        FrontendService --> FE
+---
 
-        subgraph POD2["Backend Deployment"]
+## STEP 3: KUBERNETES SETUP
 
-        
-            BE1["Backend Application Pod"]
-            BE["Backend Application Pod"]
-            BE2["Backend Application Pod"]
+**Kubernetes Cluster:**
 
-        end
+We used Google Kubernetes Engine (GKE) for deploying the backend and frontend.
+- **Cluster Configuration:**  
+    - Used `gcloud` SDK and Docker Desktop.
+    - Cluster nodes: `e2-standard-4` machine type (see [usefulcommands.md](setup-commands/usefulcommands.md) for node pool info).
+    - Autoscaling: min 1, max 3 nodes.
+    - Region: `us-central1`
 
-        BackendService["Backend Service 
-            (load balancer)"]
+- **Setup Steps:**
+    1. **Initial GCP Configuration**
+            - Authenticate with Google Cloud:
+                ```sh
+                gcloud auth login
+                ```
+            - Set project and zone:
+                ```sh
+                gcloud config set project <your-project-id>
+                gcloud config set compute/zone <your-preferred-zone>
+                ```
+    2. **Configure Artifact Registry Access**
+            - Grant IAM roles:
+                ```sh
+                gcloud projects add-iam-policy-binding <project-id> \
+                        --member=user:<your-email> \
+                        --role=roles/artifactregistry.writer
 
-        BackendService --> BE1
-        BackendService --> BE
-      
-        BackendService --> BE2
-    end
-
-    subgraph "Virtual_Machine"
-        MongoDB[("MongoDB Database")]
-    end
+                gcloud projects add-iam-policy-binding <project-id> \
+                        --member=user:<your-email> \
+                        --role=roles/artifactregistry.reader
+                ```
+            - Configure Docker authentication:
+                ```sh
+                gcloud auth configure-docker <region>-docker.pkg.dev
+                ```
+    3. **Build and Push Docker Images**
+            - Tag images:
+                ```sh
+                # Frontend
+                docker tag <your-frontend-image-name>:latest <region>-docker.pkg.dev/<project-id>/<registry-repo>/vegan-eats-frontend:latest
+                # Backend
+                docker tag <your-backend-image-name>:latest <region>-docker.pkg.dev/<project-id>/<registry-repo>/vegan-eats-backend:latest
     
-    subgraph "Serverless"
-        Payment["Serverless: payment
-                    verification"]
-    end
+                ```
+            - Push images:
+                ```sh
+                docker push <region>-docker.pkg.dev/<project-id>/<registry-repo>/vegan-eats-frontend:latest
+                docker push <region>-docker.pkg.dev/<project-id>/<registry-repo>/vegan-eats-backend:latest
+                
+                ```
+            - See [local-kubernetes.md](setup-commands/local-kubernetes.md) for more build/push details.
 
-    User(("User"))
-    User -- user sends HTTP request --> FrontendService
-    FE -- make a request to backend 
-            using 
-            RESTful API --> BackendService
-    
-    BE -- manage database 
-        via MongoDB Protocol --> MongoDB
-    BE -- for payment checks 
-        HTTPS/Webhook request --> Serverless
+            - Update `backend-deployment.yaml` and `frontend-deployment.yaml` files with your corresponding image paths.
 
-    %% Apply classes
-    class FE frontend;
-    class BE backend;
-    class BE2,BE1 backend-muted;
-    class MongoDB mongodb;
-    class Payment serverless;
-    class User user;
+    4. **Create and Configure GKE Cluster**
+            - Create the cluster:
+                ```sh
+                gcloud container clusters create "my-app-cluster" \
+                        --region us-central1 \
+                        --num-nodes 1 \
+                        --machine-type e2-standard-4 \
+                        --enable-autoscaling \
+                        --min-nodes 1 \
+                        --max-nodes 3
+                ```
+            - Verify cluster:
+                ```sh
+                kubectl top nodes
+                ```
+            - Configure firewall:
+                ```sh
+                gcloud compute firewall-rules create allow-gke-traffic \
+                        --allow=tcp:80,tcp:443 \
+                        --description="Allow HTTP/HTTPS to GKE" \
+                        --target-tags=gke-my-app-cluster
+                ```
+    5. **Deploy Application to GKE**
+            - Apply Kubernetes manifests:
+                ```sh
+                kubectl apply -f backend-configmap.yaml
+                kubectl apply -f backend-secret.yaml
+                kubectl apply -f backend-deployment.yaml
+                kubectl apply -f hpa.yaml
+                kubectl apply -f frontend-deployment.yaml
+                kubectl apply -f backend-locust-serve.yaml (Expose the backend port to external access for locust experiments)
+                ```
+            - Verify deployment:
+                ```sh
+                kubectl get pods
+                kubectl get services
+                ```
+            - Get frontend service external IP to access the ui:
+                ```sh
+                kubectl get service frontend
+                ```
 
-    class POD1,POD2,Kubernetes_Cluster,Virtual_Machine,Serverless outer
-```
+---
 
+**References:**
+- [vm-db.sh](setup-commands/vm-db.sh): Custom VM/MongoDB setup script  
+- [gke-setup.md](setup-commands/gke-setup.md): GKE deployment guide  
+- [local-kubernetes.md](setup-commands/local-kubernetes.md): Local Kubernetes and Docker image instructions  
+- [usefulcommands.md](setup-commands/usefulcommands.md): Handy GCP and Kubernetes commands  
 
-### Infrastructure Components
-- **Kubernetes Orchestration**
-  - Google Kubernetes Engine (GKE) for container orchestration
-  - Horizontal Pod Autoscaling for dynamic scaling the backend pods
-  - LoadBalancer service type for internal access
-  - ConfigMaps and Secrets for configuration management
+---
 
-- **Container Registry**
-  - Google Artifact Registry for container image management
-  - Automated container builds and deployments
-  - Version control and image tagging
-
-- **Database Layer**
-  - MongoDB deployment on VM
-  - Persistent SSD for data persistence
-
-- **Cloud Functions (Serverless Components)**
-  - `paymentValidate`: Serverless payment processing [function code](./functions/paymentValidate/)
-
-### Application Components
-
-#### Frontend (React/Vite)
-- https://github.com/nilsarisi/308_frontend.git
-- Containerized React application [Dockerfile](./frontend/308_frontend/Dockerfile)
-- Nginx-based reverse proxy
-- Multiple specialized admin interfaces
-- Deployed as Kubernetes pods with rolling updates
-
-#### Backend (Node.js)
-- https://github.com/cemrekkandemir/Vegan-Eats.git
-- RESTful API containerized in Docker [Dockerfile](./backend/Vegan-Eats/Dockerfile)
-
-- Horizontal scaling based on CPU/Memory metrics [HPA configuration](./k8s-configs/hpa.yaml)
-- Health checks and readiness probes
-
-#### Database (MongoDB)
-
-
-
-## Deployment Infrastructure
-
-### 1. Local Development Environment
-- Docker Compose for local service orchestration [see docker-compose](./docker-compose.yaml)
-- Minikube for local Kubernetes development
-- Local MongoDB instance via Docker
-- See [Local Setup Guide](./local-kubernetes.md)
-
-### 2. Production Cloud Deployment
-- **Google Cloud Platform (GCP)**
-  - GKE cluster with node autoscaling, see [GKE Deployment Guide](./gke-setupt.md) and the [folder](./k8s-configs/)
-  - Database on a vitrual machine with a linux server
-  - You can create a VM and run the shell script [vm-db.sh] (./vm-db.sh)
-
-## Performance and Reliability
-- Testing with Locust (`./tests/locust-test.py`) while also changing the cloud architecture system parameters. (we talked about this in out presentation)
-- Kubernetes liveness and readiness probes
-- Automated scaling policicies
-- Network policies for security
-
-## Project Structure
-```
-project/
-├── k8s-configs/           # Kubernetes manifests files
-│   ├── backend-deployment.yaml
-│   ├── frontend-deployment.yaml
-│   └── ...more yaml files
-|
-├── backend/              # Backend source code and Dockerfile to containerize it.
-├── frontend/             # Frontend source code and Dockerfile to containerize it. 
-├── functions/            # The source codes for the functions we deployed on Cloud Run Functions
-├── tests/                # testing realated information, locust test script and the results.
-├── setup-commands/       # the instructions to create deploy the applicaion on google cloud.
-└── docker-compose.yml    # Local development setup
-```
-
-## Testing
-
-Locust Testing details and results can be found under the [test folder](./tests/) 
+This process ensures each component is deployed on the appropriate infrastructure, with clear separation and integration between database, serverless, and Kubernetes-managed services.

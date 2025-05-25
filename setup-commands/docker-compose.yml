@@ -3,7 +3,7 @@ version: '3.8'
 services:
   backend:
     build:
-      context: ./backend/Vegan-Eats
+      context: ../backend/Vegan-Eats
     container_name: vegan-eats-backend
     ports:
       - "5000:5000"
@@ -23,7 +23,7 @@ services:
 
   frontend:
     build:
-      context: ./frontend/308_frontend
+      context: ../frontend/308_frontend
     container_name: vegan-eats-frontend
     ports:
       - "8080:80"
