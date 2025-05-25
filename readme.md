@@ -18,6 +18,7 @@ This repository includes:
 - **Documentation:**  
     - `README.md` with step-by-step deployment and setup instructions.
     - Additional setup guides and command references in the `setup-commands/` directory. 
+    - Additional overview of the repository `introduction.md`
 
 All files required to replicate the deployment and testing environment are included in this repository.
 
