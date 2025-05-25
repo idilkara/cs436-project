@@ -84,112 +84,118 @@ We used Google Kubernetes Engine (GKE) for deploying the backend and frontend.
 
 - **Setup Steps:**
     1. **Initial GCP Configuration**
-            - Authenticate with Google Cloud:
+        - Authenticate with Google Cloud:
 
-                ```sh
-                gcloud auth login
-                ```
+            ```sh
+            gcloud auth login
+            ```
 
-            - Set project and zone:
+        - Set project and zone:
 
-                ```sh
-                gcloud config set project <your-project-id>
-                gcloud config set compute/zone <your-preferred-zone>
-                ```
+            ```sh
+            gcloud config set project <your-project-id>
+            gcloud config set compute/zone <your-preferred-zone>
+            ```
 
     2. **Configure Artifact Registry Access**
-            - Grant IAM roles:
+        - Grant IAM roles:
 
-                ```sh
-                gcloud projects add-iam-policy-binding <project-id> \
-                        --member=user:<your-email> \
-                        --role=roles/artifactregistry.writer
+            ```sh
+            gcloud projects add-iam-policy-binding <project-id> \
+                    --member=user:<your-email> \
+                    --role=roles/artifactregistry.writer
 
-                gcloud projects add-iam-policy-binding <project-id> \
-                        --member=user:<your-email> \
-                        --role=roles/artifactregistry.reader
-                ```
+            gcloud projects add-iam-policy-binding <project-id> \
+                    --member=user:<your-email> \
+                    --role=roles/artifactregistry.reader
+            ```
 
-            - Configure Docker authentication:
+        - Configure Docker authentication:
 
-                ```sh
-                gcloud auth configure-docker <region>-docker.pkg.dev
-                ```
+            ```sh
+            gcloud auth configure-docker <region>-docker.pkg.dev
+            ```
 
-            - Build, Push and Tag Docker Images
+        - Build, Push and Tag Docker Images
 
-                - **Frontend:**
+            - **Frontend:**
 
-                    1. Build the Docker image:
+                1. Build the Docker image:
+
                         ```sh
                         cd frontend/308_frontend
                         docker build -t vegan-eats-frontend .
                         ```
-                    2. Tag the image for your Docker registry:
+
+                2. Tag the image for your Docker registry:
+                
                         ```sh
                         docker tag vegan-eats-frontend:latest <yourdockeraccountname>/vegan-eats-frontend:latest
                         ```
 
-                - **Backend:**
+            - **Backend:**
 
-                    1. Build the Docker image:
-                        ```sh
-                        cd backend/vegan-eats
-                        docker build -t vegan-eats-backend .
-                        ```
-                    2. Tag the image for your Docker registry:
+                1. Build the Docker image:
 
-                        ```sh
-                        docker tag vegan-eats-backend:latest <yourdockeraccountname>/vegan-eats-backend:latest
-                        ```
+                    ```sh
+                    cd backend/vegan-eats
+                    docker build -t vegan-eats-backend .
+                    ```
+                2. Tag the image for your Docker registry:
 
+                    ```sh
+                    docker tag vegan-eats-backend:latest <yourdockeraccountname>/vegan-eats-backend:latest
+                    ```
+
+            - **tag the images**
                 ```sh
-
-                # Frontend
                 docker tag <your-frontend-image-name>:latest <region>-docker.pkg.dev/<project-id>/<registry-repo>/vegan-eats-frontend:latest
-                # Backend
                 docker tag <your-backend-image-name>:latest <region>-docker.pkg.dev/<project-id>/<registry-repo>/vegan-eats-backend:latest
     
                 ```
+            
+            - **push the images to google artifaact registry**
 
+                ```sh
+                docker push <region>-docker.pkg.dev/<project-id>/<registry-repo>/vegan-eats-frontend:latest
+                docker push <region>-docker.pkg.dev/<project-id>/<registry-repo>/vegan-eats-backend:late
+                ```      
         
-            - See [local-kubernetes.md](setup-commands/local-kubernetes.md) for more build/push details.
-
             - Update `backend-deployment.yaml` and `frontend-deployment.yaml` files with your corresponding image paths.
 
     4. **Create and Configure GKE Cluster**
 
             - Create the cluster:
 
-                ```sh
+                ```
                 gcloud container clusters create "my-app-cluster" \
-                        --region us-central1 \
-                        --num-nodes 1 \
-                        --machine-type e2-standard-4 \
-                        --enable-autoscaling \
-                        --min-nodes 1 \
-                        --max-nodes 3
+                  --region us-central1 \
+                  --num-nodes 1 \
+                  --machine-type e2-standard-4 \
+                  --enable-autoscaling \
+                  --min-nodes 1 \
+                  --max-nodes 3
                 ```
 
             - Verify cluster:
 
-                ```sh
+                ```
                 kubectl top nodes
                 ```
 
             - Configure firewall:
 
-                ```sh
+                ```
                 gcloud compute firewall-rules create allow-gke-traffic \
-                        --allow=tcp:80,tcp:443 \
-                        --description="Allow HTTP/HTTPS to GKE" \
-                        --target-tags=gke-my-app-cluster
+                  --allow=tcp:80,tcp:443 \
+                  --description="Allow HTTP/HTTPS to GKE" \
+                  --target-tags=gke-my-app-cluster
                 ```
 
     5. **Deploy Application to GKE**
             - Apply Kubernetes manifests:
 
-                ```sh
+                ```
                 kubectl apply -f backend-configmap.yaml
                 kubectl apply -f backend-secret.yaml
                 kubectl apply -f backend-deployment.yaml
@@ -199,12 +205,13 @@ We used Google Kubernetes Engine (GKE) for deploying the backend and frontend.
                 ```
 
             - Verify deployment:
-                ```sh
+            
+                ```
                 kubectl get pods
                 kubectl get services
                 ```
-            - Get frontend service external IP to access the ui:
-                ```sh
+            - Get frontend service external IP to access the UI:
+                ```
                 kubectl get service frontend
                 ```
 
