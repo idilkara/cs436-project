@@ -16,7 +16,7 @@ This repository includes:
     This folder also includes the results we collected and th terminal commands we used to run the experiments.
 
 - **Documentation:**  
-    - [`Readme.md`](Readme.md) with step-by-step deployment and setup instructions.
+    - [`Readme.md`](readme.md) with step-by-step deployment and setup instructions.
         - Additional setup guides and command references in the [`setup-commands/`](setup-commands/) directory.
         - Additional overview of the repository in [`introduction.md`](introduction.md)
     - A demonstration [video](cs436_demo.mp4) of our working system is also available in this repository. 
