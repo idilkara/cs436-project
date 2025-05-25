@@ -3,22 +3,22 @@
 This repository includes:
 
 - **Application Source Code:**  
-    Source code for both backend and frontend components.
-    backend source code is in `backend/` folder
-    frontend source code is in `frontend/` folder
+    Source code for both backend and frontend components:  
+    - Backend source code is in [`backend/`](backend/) folder  
+    - Frontend source code is in [`frontend/`](frontend/) folder
 
-- **Deployment Scripts and Manifests:**  
-    - Kubernetes YAML manifests for deploying services, configmaps, secrets, and autoscalers are in `k8s-configs/` folder
-    - Also the setup scripts for setting up the VM and the commadns for  creating the kubernetes cluster are given in the same folder.
+    - **Deployment Scripts and Manifests:**  
+        - Kubernetes YAML manifests for deploying services, configmaps, secrets, and autoscalers are in the [`k8s-configs/`](k8s-configs/) folder  
+        - Setup scripts for the VM and commands for creating the Kubernetes cluster are also provided in the same folder.
 
 - **Load Testing Scripts:**  
     Locust scripts for performance and load testing, are in the tests folder.
     This folder also includes the results we collected and th terminal commands we used to run the experiments.
 
 - **Documentation:**  
-    - `README.md` with step-by-step deployment and setup instructions.
-    - Additional setup guides and command references in the `setup-commands/` directory. 
-    - Additional overview of the repository `introduction.md`
+    - [`README.md`](README.md) with step-by-step deployment and setup instructions.
+        - Additional setup guides and command references in the [`setup-commands/`](setup-commands/) directory.
+        - Additional overview of the repository in [`introduction.md`](introduction.md)
 
 All files required to replicate the deployment and testing environment are included in this repository.
 
@@ -64,10 +64,10 @@ We separated the payment verification logic into a serverless function.
   - Selected region: `us-central1`
   - Runtime: `nodejs`
   - Allowed unauthenticated access.
-  - Deployed the function to Google Cloud Run using GCP dashboard.
+- Deployed the function to Google Cloud Run using the GCP dashboard.
 - **Integration:**  
-  - Updated the function URL in the Kubernetes configmap `backend-configmap.yaml` .
-  - If you have started the kubernetes before this step, you can restart the backend pod to ensure it uses the new serverless endpoint.
+    - Updated the function URL in the Kubernetes configmap [`backend-configmap.yaml`](k8s-configs/backend-configmap.yaml).
+    - If you started Kubernetes before this step, restart the backend pod to ensure it uses the new serverless endpoint.
 
 ---
 
@@ -85,16 +85,21 @@ We used Google Kubernetes Engine (GKE) for deploying the backend and frontend.
 - **Setup Steps:**
     1. **Initial GCP Configuration**
             - Authenticate with Google Cloud:
+
                 ```sh
                 gcloud auth login
                 ```
+
             - Set project and zone:
+
                 ```sh
                 gcloud config set project <your-project-id>
                 gcloud config set compute/zone <your-preferred-zone>
                 ```
+
     2. **Configure Artifact Registry Access**
             - Grant IAM roles:
+
                 ```sh
                 gcloud projects add-iam-policy-binding <project-id> \
                         --member=user:<your-email> \
@@ -104,25 +109,50 @@ We used Google Kubernetes Engine (GKE) for deploying the backend and frontend.
                         --member=user:<your-email> \
                         --role=roles/artifactregistry.reader
                 ```
+
             - Configure Docker authentication:
+
                 ```sh
                 gcloud auth configure-docker <region>-docker.pkg.dev
                 ```
-    3. **Build and Push Docker Images**
-            - Tag images:
+
+            - Build, Push and Tag Docker Images
+
+                - **Frontend:**
+
+                    1. Build the Docker image:
+                        ```sh
+                        cd frontend/308_frontend
+                        docker build -t vegan-eats-frontend .
+                        ```
+                    2. Tag the image for your Docker registry:
+                        ```sh
+                        docker tag vegan-eats-frontend:latest <yourdockeraccountname>/vegan-eats-frontend:latest
+                        ```
+
+                - **Backend:**
+
+                    1. Build the Docker image:
+                        ```sh
+                        cd backend/vegan-eats
+                        docker build -t vegan-eats-backend .
+                        ```
+                    2. Tag the image for your Docker registry:
+
+                        ```sh
+                        docker tag vegan-eats-backend:latest <yourdockeraccountname>/vegan-eats-backend:latest
+                        ```
+
                 ```sh
+
                 # Frontend
                 docker tag <your-frontend-image-name>:latest <region>-docker.pkg.dev/<project-id>/<registry-repo>/vegan-eats-frontend:latest
                 # Backend
                 docker tag <your-backend-image-name>:latest <region>-docker.pkg.dev/<project-id>/<registry-repo>/vegan-eats-backend:latest
     
                 ```
-            - Push images:
-                ```sh
-                docker push <region>-docker.pkg.dev/<project-id>/<registry-repo>/vegan-eats-frontend:latest
-                docker push <region>-docker.pkg.dev/<project-id>/<registry-repo>/vegan-eats-backend:latest
-                
-                ```
+
+        
             - See [local-kubernetes.md](setup-commands/local-kubernetes.md) for more build/push details.
 
             - Update `backend-deployment.yaml` and `frontend-deployment.yaml` files with your corresponding image paths.
