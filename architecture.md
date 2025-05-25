@@ -104,7 +104,7 @@ flowchart TD
     FE -- 3 RESTful API Call --> BackendService
     BackendService -- 4 Load Balances to --> BE
     BE -- 5 DB Query --> MongoDB
-    BE -- 6 Payment Webhook --> Payment
+    BE -- 6 Payment Verification Request --> Payment
     Payment -- 7 Payment Result --> BE
     BE -- 8 Response --> FE
     FE -- 9 Response --> User
