@@ -37,7 +37,7 @@ All files required to replicate the deployment and testing environment are inclu
 
 **3.1 Virtual Machine:**
 
-We started by creating a Virtual Machine (VM) instance for our database.  
+We started by creating a Virtual Machine (VM) instance for our database using GCP dashboard.  
 - **Configuration:**  
   - Machine type: `e2-medium`
   - Disk: 10GB standard persistent disk
@@ -56,14 +56,14 @@ We started by creating a Virtual Machine (VM) instance for our database.
 
 **Serverless:**
 
-We separated the payment verification logic into a serverless function.
+We separated the payment verification logic into a serverless function. 
 - **Development:**  
   - Created the source code for the serverless function (mock payment validation).
 - **Deployment:**  
   - Selected region: `us-central1`
   - Runtime: `nodejs`
   - Allowed unauthenticated access.
-  - Deployed the function to Google Cloud Run.
+  - Deployed the function to Google Cloud Run using GCP dashboard.
 - **Integration:**  
   - Updated the function URL in the Kubernetes configmap `backend-configmap.yaml` .
   - If you have started the kubernetes before this step, you can restart the backend pod to ensure it uses the new serverless endpoint.
@@ -74,9 +74,9 @@ We separated the payment verification logic into a serverless function.
 
 **Kubernetes Cluster:**
 
-We used Google Kubernetes Engine (GKE) for deploying the backend and frontend.
+We used Google Kubernetes Engine (GKE) for deploying the backend and frontend. 
 - **Cluster Configuration:**  
-    - Used `gcloud` SDK and Docker Desktop.
+    - We used `gcloud` SDK and Docker Desktop to create the cluster and apply the manifest files.
     - Cluster nodes: `e2-standard-4` machine type (see [usefulcommands.md](setup-commands/usefulcommands.md) for node pool info).
     - Autoscaling: min 1, max 3 nodes.
     - Region: `us-central1`
