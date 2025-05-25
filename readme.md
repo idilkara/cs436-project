@@ -214,7 +214,7 @@ We used Google Kubernetes Engine (GKE) for deploying the backend and frontend.
 
 # REPRODUCIBILITY OF EXPERIMENTS
 
-The details of our experiments are in the [`tests/`](./tests/) folder. Please refer to the [`tests/readme.md`](./tests/readme.md) file for more details.
+The details of our experiments are in the [`tests/`](./tests/) folder. Please refer to the [`tests/README.md`](./tests/README.md) file for more details.
 
 
 ---
