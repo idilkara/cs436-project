@@ -1,6 +1,6 @@
 # Load Testing with Locust
 
-This document provides an overview of our load testing methodology using Locust for our e-commerce application.
+This document provides an overview of our load testing methodology using Locust for our e-commerce application with different infrastructure and configurations.
 
 ## Overview
 
@@ -69,7 +69,7 @@ Each configuration was tested with specific test types:
 
 ## Test Results
 
-The detailed test results are available in the respective configuration folders within the `tests/` directory. Each folder contains HTML reports, screenshots, and metrics captured during the testing process.
+The detailed test results are available in the respective configuration folders within this tests directory. Each folder contains HTML reports, screenshots, and metrics captured during the testing process.
 
 These results provide insights into:
 - Response times under different load conditions
