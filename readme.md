@@ -16,7 +16,7 @@ This repository includes:
     This folder also includes the results we collected and th terminal commands we used to run the experiments.
 
 - **Documentation:**  
-    - [`README.md`](README.md) with step-by-step deployment and setup instructions.
+    - [`Readme.md`](Readme.md) with step-by-step deployment and setup instructions.
         - Additional setup guides and command references in the [`setup-commands/`](setup-commands/) directory.
         - Additional overview of the repository in [`introduction.md`](introduction.md)
     - A demonstration [video](cs436_demo.mp4) of our working system is also available in this repository. 
@@ -46,7 +46,7 @@ We started by creating a Virtual Machine (VM) instance for our database using GC
   - Machine type: `e2-medium`
   - Disk: 10GB standard persistent disk
   - OS: Ubuntu 22.04 LTS  
-  - See [usefulcommands.md](setup-commands/usefulcommands.md) for commands to list and describe VMs.
+
 - **Firewall:**  
   - Enabled HTTP and HTTPS connections.
 - **Setup:**  
@@ -85,7 +85,7 @@ We separated the payment verification logic into a serverless function.
 We used Google Kubernetes Engine (GKE) for deploying the backend and frontend. 
 - **Cluster Configuration:**  
     - We used `gcloud` SDK and Docker Desktop to create the cluster and apply the manifest files.
-    - Cluster nodes: `e2-standard-4` machine type (see [usefulcommands.md](setup-commands/usefulcommands.md) for node pool info).
+    - Cluster nodes: `e2-standard-4` machine type 
     - Autoscaling: min 1, max 3 nodes.
     - Region: `us-central1`
 
