@@ -53,8 +53,8 @@ We tested multiple infrastructure configurations to determine the optimal setup:
 | B | e2-standard-4 (4 vCPU, 16 GB) | 10 GB Standard PD | e2-standard-4 | 3 | 1-3 | VM CPU & RAM improvements |
 | C | e2-standard-4 | 20 GB SSD PD | e2-standard-4 | 3 | 1-3 | VM disk I/O & size optimization |
 | D | e2-standard-4 | 20 GB SSD PD | n2-standard-4 (4 vCPU, 16 GB) | 3 | 1-3 | Node CPU architecture enhancements |
-| E | e2-standard-4 | 20 GB SSD PD | n2-standard-4 | 5 | 3-7 | Cluster scale-out capabilities |
-| F | n2-highcpu-8 (8 vCPU, 8 GB) | 20 GB SSD PD | n2-highcpu-8 (8 vCPU, 8 GB) | 3 | 1-3 | High-CPU workload optimization |
+| E | e2-standard-4 | 20 GB SSD PD | n2-standard-4 | 3 | 3-7 | Cluster scale-out capabilities |
+| F | n2-highcpu-8 (8 vCPU, 8 GB) | 20 GB SSD PD | n2-highcpu-8 (8 vCPU, 8 GB) | 2 | 1-3 | High-CPU workload optimization |
 
 ## Test Distribution
 
@@ -80,4 +80,12 @@ These results provide insights into:
 
 ## Conclusion
 
-TODO
+### Bottlenecks Identified
+- K8s CPU Bottleneck: Kubernetes vCPU emerged as the primary constraint under high load
+- VM Database CPU Bottleneck: VM vCPU was the second biggest constraint our system faced under high load
+
+### Other Findings 
+- Disk I/O Impact: Less significant than anticipated, suggesting CPU was a larger constraint
+- Memory Utilization: Memory limit was never an issue (neither for VMs nor Cluster nodes), around 0.5 utilization at most
+- Architecture Benefits: n2 CPU architecture provided very modest improvements
+- Soak Test Stability: System demonstrated excellent long-term stability with no memory leaks or performance degradation
