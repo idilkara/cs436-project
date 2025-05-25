@@ -7,9 +7,9 @@ This repository includes:
     - Backend source code is in [`backend/`](backend/) folder  
     - Frontend source code is in [`frontend/`](frontend/) folder
 
-    - **Deployment Scripts and Manifests:**  
-        - Kubernetes YAML manifests for deploying services, configmaps, secrets, and autoscalers are in the [`k8s-configs/`](k8s-configs/) folder  
-        - Setup scripts for the VM and commands for creating the Kubernetes cluster are also provided in the same folder.
+- **Deployment Scripts and Manifests:**  
+    - Kubernetes YAML manifests for deploying services, configmaps, secrets, and autoscalers are in the [`k8s-configs/`](k8s-configs/) folder  
+    - Setup scripts for the VM and commands for creating the Kubernetes cluster are also provided in the same folder.
 
 - **Load Testing Scripts:**  
     Locust scripts for performance and load testing, are in the tests folder.
